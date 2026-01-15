@@ -1,0 +1,287 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    /* Prevent double-tap zoom / scroll jank on mobile while interacting with the game */
+    overscroll-behavior: none;
+}
+
+.container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.game-header h1 {
+    font-size: 3em;
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.8),
+        0 0 20px rgba(255, 0, 255, 0.6),
+        0 0 30px rgba(0, 255, 255, 0.4);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.8),
+            0 0 20px rgba(255, 0, 255, 0.6),
+            0 0 30px rgba(0, 255, 255, 0.4);
+    }
+    to {
+        text-shadow: 
+            0 0 20px rgba(255, 255, 255, 1),
+            0 0 30px rgba(255, 0, 255, 0.8),
+            0 0 40px rgba(0, 255, 255, 0.6);
+    }
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    /* Prevent browser gestures inside the game area */
+    touch-action: none;
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(180deg, #1a0033 0%, #330066 50%, #4d0099 100%);
+    /* Prevent browser panning/zooming so touch controls feel like a real game */
+    touch-action: none;
+}
+
+/* Mobile layout tweaks */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .game-header h1 {
+        font-size: 2em;
+    }
+
+    .screen {
+        width: calc(100% - 24px);
+        max-width: 420px;
+        padding: 22px 18px;
+    }
+
+    .score-panel {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        font-size: 1.05em;
+    }
+}
+
+#ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.score-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+.left-panel, .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.right-panel {
+    align-items: flex-end;
+}
+
+.high-score {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+
+.icon-btn {
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.2em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+    padding: 0;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.status-indicators {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    pointer-events: none;
+}
+
+.indicator {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.2em;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.indicator.hidden {
+    display: none;
+}
+
+#multiplier {
+    color: #9400d3;
+    text-shadow: 0 0 10px #9400d3;
+    border: 2px solid #9400d3;
+}
+
+#invincible {
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffd700;
+    border: 2px solid #ffd700;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 40px 60px;
+    border-radius: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    pointer-events: auto;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+.screen h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
+}
+
+.screen p {
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.high-score-display {
+    margin-top: 20px;
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+.new-high-score {
+    color: #ffd700;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-shadow: 0 0 10px #ffd700;
+    animation: glow 1s ease-in-out infinite alternate;
+}
+
+.new-high-score.hidden {
+    display: none;
+}
+
+button {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 0, 255, 0.6);
+}
+
+button:active {
+    transform: translateY(0);
+    background: linear-gradient(135deg, #cc00cc 0%, #00cccc 100%);
+}
+
+button:focus {
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.controls {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.controls p {
+    font-size: 1.1em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
