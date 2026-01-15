@@ -2,6 +2,10 @@
 
 A web-based recreation of the classic endless runner game "Robot Unicorn Attack" using HTML5 Canvas and vanilla JavaScript.
 
+[![Email](https://img.shields.io/badge/Email-Contact%20Me-blue?style=for-the-badge&logo=gmail)](mailto:solcanine66@gmail.com)
+[![Telegram](https://img.shields.io/badge/Telegram-Message%20Me-2CA5E0?style=for-the-badge&logo=telegram)](https://t.me/solcanine)
+[![Twitter](https://img.shields.io/badge/Twitter-@solcanine-black?style=for-the-badge&logo=twitter&logoColor=1DA1F2)](https://x.com/solcanine)
+
 ## 🎮 Features
 
 - **Smooth endless runner gameplay** - Auto-scrolling platforms with increasing difficulty
@@ -26,19 +30,22 @@ A web-based recreation of the classic endless runner game "Robot Unicorn Attack"
 ## 🕹️ Controls
 
 ### PC / Keyboard
-| Key | Action |
-|-----|--------|
-| **SPACE** | Jump / Double Jump |
-| **Z** | Dash (breaks through stars) |
-| **P** | Pause / Unpause |
+
+| Key       | Action                      |
+| --------- | --------------------------- |
+| **SPACE** | Jump / Double Jump          |
+| **Z**     | Dash (breaks through stars) |
+| **P**     | Pause / Unpause             |
 
 ### Mobile / Touch
-| Action | Control |
-|--------|---------|
+
+| Action   | Control                               |
+| -------- | ------------------------------------- |
 | **Jump** | Tap anywhere on left/center of screen |
-| **Dash** | Tap on the right side of the screen |
+| **Dash** | Tap on the right side of the screen   |
 
 ### UI Controls
+
 - **🔊/🔇 Button** - Toggle sound on/off
 
 ## 🚀 How to Play
@@ -62,17 +69,20 @@ unicorn-attack-game/
 ## 🎨 Game Mechanics
 
 ### Player
+
 - Auto-runs forward at increasing speed
 - Can jump (2 jumps available - ground jump + air jump)
 - Dash ability with cooldown (1 second)
 - Dies when falling off platforms or hitting obstacles without dashing
 
 ### Platforms
+
 - Randomly generated with varying gaps and widths
 - Beautiful gradient colors (pink to purple)
 - Decorated with small stars
 
 ### Obstacles
+
 - **Standard Stars (Magenta)** - Rotating obstacles that appear on platforms
 - **Floating Stars (Cyan)** - Move up and down slowly in a sine wave pattern
 - **Moving Stars (Orange)** - Move up and down quickly with larger amplitude
@@ -80,6 +90,7 @@ unicorn-attack-game/
 - Hitting them without dashing or invincibility costs one life
 
 ### Power-Ups
+
 - **Golden Star (⭐)** - Grants 5 seconds of invincibility
 - **Purple Diamond (💎)** - 2x score multiplier for 5 seconds
 - **Pink Heart (❤️)** - Grants an extra life (or +500 points if at max lives)
@@ -87,6 +98,7 @@ unicorn-attack-game/
 - Collected automatically when player touches them
 
 ### Scoring
+
 - Continuous score for surviving (1 point per frame × multiplier)
 - Bonus points for destroying obstacles (100 points × multiplier)
 - Extra life power-up gives +500 points if already at max lives
@@ -107,6 +119,7 @@ unicorn-attack-game/
 ## 🎯 Future Enhancements
 
 Potential features to add:
+
 - [x] Sound effects and background music ✅
 - [x] Power-ups (invincibility, score multipliers) ✅
 - [x] High score tracking (localStorage) ✅
@@ -129,4 +142,3 @@ Built with ❤️ and 🦄
 ---
 
 **Enjoy the game! Always believe in your dreams! ✨**
-
