@@ -792,9 +792,9 @@ const gameManager = {
             assets.unicorn.img.onerror = () => {
                 assets.unicorn.loaded = false;
                 assets.unicorn.failed = true;
-                console.warn('Failed to load unicorn sprite (assets/unicorn.svg). Falling back to canvas shape.');
+                console.warn('Failed to load unicorn sprite (assets/unicorn.png). Falling back to canvas shape.');
             };
-            assets.unicorn.img.src = 'assets/unicorn.svg';
+            assets.unicorn.img.src = 'assets/unicorn.png';
 
             this.setupEventListeners();
             this.createBackgroundStars();
