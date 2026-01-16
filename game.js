@@ -265,6 +265,9 @@ class Player {
         this.lastDashTime = 0;
         this.particles = [];
         this.rotation = 0;
+        // Smooth rainbow ribbon trail (replaces bubble particles)
+        this.trail = [];
+        this.trailHue = 0;
     }
 
     jump() {
@@ -386,20 +389,34 @@ class Player {
     }
 
     updateParticles() {
-        // Create new rainbow particles
-        if (game.state === 'playing' && Math.random() < 0.5) {
-            this.particles.push({
-                x: this.x + this.width / 2,
-                y: this.y + this.height / 2,
-                vx: (Math.random() - 0.5) * 2 - 3,
-                vy: (Math.random() - 0.5) * 2,
-                size: Math.random() * 8 + 4,
+        // Rainbow ribbon trail points (instead of bubbles)
+        if (game.state === 'playing') {
+            this.trailHue = (this.trailHue + 6) % 360;
+
+            const anchorX = this.x + this.width * 0.15;
+            const anchorY = this.y + this.height * 0.55;
+
+            this.trail.push({
+                x: anchorX,
+                y: anchorY,
                 life: 1,
-                hue: Math.random() * 360
+                hue: this.trailHue
             });
+
+            // Limit length for performance
+            if (this.trail.length > 60) {
+                this.trail.shift();
+            }
         }
 
-        // Update and remove old particles
+        // Update trail points so they drift left with world scroll
+        this.trail = this.trail.filter(t => {
+            t.x -= game.scrollSpeed;
+            t.life -= 0.03;
+            return t.life > 0;
+        });
+
+        // Update and remove spark particles (used for explosions)
         this.particles = this.particles.filter(p => {
             p.x += p.vx;
             p.y += p.vy;
@@ -425,7 +442,111 @@ class Player {
     }
 
     draw(ctx) {
-        // Draw rainbow trail particles
+        // Draw rainbow ribbon trail (7 crisp stripes like the classic game)
+        if (this.trail.length > 1) {
+            ctx.save();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const stripes = [
+                '#ff0000', // Red
+                '#ff7a00', // Orange
+                '#ffe600', // Yellow
+                '#2dff4a', // Green
+                '#00e5ff', // Cyan
+                '#2a6bff', // Blue
+                '#b400ff'  // Violet
+            ];
+
+            // Helper: draw a smooth curve through the trail points with an added y-offset
+            const drawSmoothTrail = (yOffset) => {
+                ctx.beginPath();
+                const pts = this.trail;
+                // Move to first point
+                ctx.moveTo(pts[0].x, pts[0].y + yOffset);
+                // Quadratic smoothing: curve to midpoints
+                for (let i = 1; i < pts.length - 1; i++) {
+                    const xc = (pts[i].x + pts[i + 1].x) / 2;
+                    const yc = (pts[i].y + pts[i + 1].y) / 2 + yOffset;
+                    ctx.quadraticCurveTo(pts[i].x, pts[i].y + yOffset, xc, yc);
+                }
+                // Final segment
+                const last = pts[pts.length - 1];
+                ctx.lineTo(last.x, last.y + yOffset);
+            };
+
+            // Soft glow behind the whole rainbow (single stroke, not per-color blur)
+            ctx.globalAlpha = 0.25;
+            ctx.shadowBlur = 22;
+            ctx.shadowColor = 'rgba(255,255,255,0.6)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = 26;
+            drawSmoothTrail(0);
+            ctx.stroke();
+
+            // Draw 7 separate, clearly-visible stripes (no heavy blur so colors don't blend)
+            ctx.globalAlpha = 0.95;
+            ctx.shadowBlur = 0;
+
+            const stripeThickness = 4.2; // thickness of each band
+            for (let i = 0; i < stripes.length; i++) {
+                const yOffset = (i - 3) * stripeThickness;
+                ctx.strokeStyle = stripes[i];
+                ctx.lineWidth = stripeThickness;
+                drawSmoothTrail(yOffset);
+                ctx.stroke();
+            }
+
+            if (this.trail.length > 10) {
+                const pts = this.trail;
+                const shimmerLen = Math.min(14, pts.length - 2);
+                const t = Date.now() / 60; // speed
+                const start = Math.floor(t % (pts.length - shimmerLen));
+                const end = start + shimmerLen;
+
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = 0.7;
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = 'rgba(255,255,255,0.9)';
+
+                // A thin highlight across the center of the rainbow
+                ctx.lineWidth = 3;
+
+                // Gradient so the highlight fades at the ends
+                const p0 = pts[start];
+                const p1 = pts[end - 1];
+                const grad = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
+                grad.addColorStop(0, 'rgba(255,255,255,0)');
+                grad.addColorStop(0.25, 'rgba(255,255,255,0.9)');
+                grad.addColorStop(0.75, 'rgba(255,255,255,0.9)');
+                grad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.strokeStyle = grad;
+
+                ctx.beginPath();
+                ctx.moveTo(p0.x, p0.y);
+                for (let i = start + 1; i < end - 1; i++) {
+                    const xc = (pts[i].x + pts[i + 1].x) / 2;
+                    const yc = (pts[i].y + pts[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+                }
+                ctx.lineTo(p1.x, p1.y);
+                ctx.stroke();
+
+                // Tiny sparkle point at the leading edge
+                ctx.globalAlpha = 0.9;
+                ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                ctx.beginPath();
+                ctx.arc(p1.x, p1.y, 2.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        // Draw explosion spark particles
         this.particles.forEach(p => {
             ctx.save();
             ctx.globalAlpha = p.life;
