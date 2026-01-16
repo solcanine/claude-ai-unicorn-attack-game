@@ -1036,6 +1036,48 @@ const gameManager = {
                 muteBtn.textContent = muted ? '🔇' : '🔊';
             });
         }
+
+        // Window resize handler for mobile orientation changes
+        let resizeTimeout;
+        const handleResizeEvent = () => {
+            // Debounce resize events
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.handleResize();
+            }, 250);
+        };
+
+        window.addEventListener('resize', handleResizeEvent);
+        
+        // Also listen for orientation change (better mobile support)
+        window.addEventListener('orientationchange', () => {
+            // Orientation change needs a slight delay for accurate dimensions
+            setTimeout(() => {
+                this.handleResize();
+            }, 300);
+        });
+
+        // Listen for screen orientation API if available
+        if (screen.orientation) {
+            screen.orientation.addEventListener('change', handleResizeEvent);
+        }
+    },
+
+    handleResize() {
+        // Update canvas dimensions with device pixel ratio
+        game.dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+        game.canvas.width = Math.floor(CONFIG.canvas.width * game.dpr);
+        game.canvas.height = Math.floor(CONFIG.canvas.height * game.dpr);
+        // CSS keeps it responsive
+        game.canvas.style.width = '100%';
+        game.canvas.style.height = 'auto';
+        
+        // Log orientation for debugging
+        if (window.matchMedia("(orientation: portrait)").matches) {
+            console.log('Orientation: Portrait');
+        } else if (window.matchMedia("(orientation: landscape)").matches) {
+            console.log('Orientation: Landscape');
+        }
     },
 
     createBackgroundStars() {
@@ -1124,7 +1166,9 @@ const gameManager = {
 
         if (game.state === 'playing') {
             this.update();
+            this.draw();
         } else if (game.state === 'paused') {
+            this.draw();
             // Draw paused text
             game.ctx.save();
             game.ctx.fillStyle = 'white';
@@ -1132,9 +1176,10 @@ const gameManager = {
             game.ctx.textAlign = 'center';
             game.ctx.fillText('PAUSED', CONFIG.canvas.width / 2, CONFIG.canvas.height / 2);
             game.ctx.restore();
+        } else if (game.state === 'gameOver' || game.state === 'menu') {
+            // Only draw background, don't draw game objects
+            // The UI overlay will handle the menu/game over screens
         }
-
-        this.draw();
     },
 
     update() {
@@ -1303,6 +1348,12 @@ const gameManager = {
             audioManager.playSound('hit');
             
             if (game.wishes <= 0) {
+                // Reset player state before game over
+                if (this.player) {
+                    this.player.isDashing = false;
+                    this.player.velocityX = 0;
+                    this.player.velocityY = 0;
+                }
                 this.gameOver();
             } else {
                 // Reset player position
@@ -1318,6 +1369,11 @@ const gameManager = {
     gameOver() {
         game.state = 'gameOver';
         audioManager.stopBackgroundMusic();
+        
+        // Clear all power-up states to prevent bugs
+        game.invincible = false;
+        game.invincibleTime = 0;
+        game.scoreMultiplier = 1;
         
         const finalScore = Math.floor(game.score);
         document.getElementById('final-score').textContent = finalScore;
