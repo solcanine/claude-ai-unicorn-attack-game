@@ -31,7 +31,7 @@ body {
 
 .game-header h1 {
     font-size: 3em;
-    text-shadow: 
+    text-shadow:
         0 0 10px rgba(255, 255, 255, 0.8),
         0 0 20px rgba(255, 0, 255, 0.6),
         0 0 30px rgba(0, 255, 255, 0.4);
@@ -40,13 +40,14 @@ body {
 
 @keyframes glow {
     from {
-        text-shadow: 
+        text-shadow:
             0 0 10px rgba(255, 255, 255, 0.8),
             0 0 20px rgba(255, 0, 255, 0.6),
             0 0 30px rgba(0, 255, 255, 0.4);
     }
+
     to {
-        text-shadow: 
+        text-shadow:
             0 0 20px rgba(255, 255, 255, 1),
             0 0 30px rgba(255, 0, 255, 0.8),
             0 0 40px rgba(0, 255, 255, 0.6);
@@ -122,6 +123,15 @@ body {
         margin-top: 12px;
     }
 
+    .pause-buttons button {
+        padding: 10px 28px;
+        font-size: 1em;
+    }
+
+    #pause-screen p {
+        font-size: 1em;
+    }
+
     .high-score-display {
         margin-top: 12px;
         font-size: 0.9em;
@@ -142,11 +152,22 @@ body {
 
     .status-indicators {
         top: 60px;
+        gap: 8px;
     }
 
     .indicator {
-        padding: 8px 14px;
-        font-size: 0.9em;
+        padding: 3px 6px;
+        font-size: 0.55em;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.6);
+        max-width: 85%;
+        animation: pulseMobile 1s ease-in-out infinite;
+    }
+
+    #multiplier,
+    #invincible {
+        border-width: 1px;
+        text-shadow: 0 0 4px;
     }
 }
 
@@ -207,6 +228,23 @@ body {
     .controls p {
         font-size: 0.8em;
     }
+
+    .status-indicators {
+        top: 50px;
+        gap: 5px;
+    }
+
+    .indicator {
+        padding: 3px 6px;
+        font-size: 0.55em;
+        border-radius: 8px;
+    }
+
+    #multiplier,
+    #invincible {
+        border-width: 1px;
+        text-shadow: 0 0 4px;
+    }
 }
 
 /* Smaller phones (like iPhone SE, smaller Android) */
@@ -253,6 +291,26 @@ body {
     .controls p {
         font-size: 0.78em;
     }
+
+    .status-indicators {
+        top: 45px;
+        gap: 4px;
+    }
+
+    .indicator {
+        padding: 2px 5px;
+        font-size: 0.5em;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.55);
+        max-width: 80%;
+        animation: pulseMobile 1s ease-in-out infinite;
+    }
+
+    #multiplier,
+    #invincible {
+        border-width: 1px;
+        text-shadow: 0 0 3px;
+    }
 }
 
 /* Very small devices */
@@ -294,6 +352,23 @@ body {
 
     .controls p {
         font-size: 0.75em;
+    }
+
+    .status-indicators {
+        top: 40px;
+        gap: 4px;
+    }
+
+    .indicator {
+        padding: 2px 5px;
+        font-size: 0.55em;
+        border-radius: 6px;
+    }
+
+    #multiplier,
+    #invincible {
+        border-width: 1px;
+        text-shadow: 0 0 3px;
     }
 }
 
@@ -359,12 +434,20 @@ body {
     }
 
     .status-indicators {
-        top: 45px;
+        top: 35px;
+        gap: 5px;
     }
 
     .indicator {
-        padding: 5px 10px;
-        font-size: 0.8em;
+        padding: 4px 8px;
+        font-size: 0.75em;
+        border-radius: 10px;
+    }
+
+    #multiplier,
+    #invincible {
+        border-width: 1px;
+        text-shadow: 0 0 5px;
     }
 
     .icon-btn {
@@ -433,7 +516,20 @@ body {
     }
 
     .status-indicators {
-        top: 35px;
+        top: 30px;
+        gap: 4px;
+    }
+
+    .indicator {
+        padding: 3px 6px;
+        font-size: 0.7em;
+        border-radius: 8px;
+    }
+
+    #multiplier,
+    #invincible {
+        border-width: 1px;
+        text-shadow: 0 0 4px;
     }
 }
 
@@ -459,7 +555,8 @@ body {
     pointer-events: none;
 }
 
-.left-panel, .right-panel {
+.left-panel,
+.right-panel {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -513,6 +610,9 @@ body {
     font-weight: bold;
     font-size: 1.2em;
     animation: pulse 1s ease-in-out infinite;
+    white-space: nowrap;
+    text-align: center;
+    max-width: 90%;
 }
 
 .indicator.hidden {
@@ -532,8 +632,27 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes pulseMobile {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
 }
 
 .screen {
@@ -612,6 +731,28 @@ button:focus {
     outline: 3px solid rgba(255, 255, 255, 0.5);
 }
 
+/* Pause menu specific styles */
+.pause-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.pause-buttons button {
+    width: 100%;
+    max-width: 250px;
+    margin-top: 0;
+}
+
+#pause-screen p {
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    color: #ffd700;
+    font-weight: bold;
+}
+
 .controls {
     text-align: center;
     margin-top: 20px;
@@ -627,4 +768,3 @@ button:focus {
     font-size: 1.1em;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
-

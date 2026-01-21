@@ -46,7 +46,7 @@ const audioManager = {
             // Create audio context for sound effects
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this.initialized = true;
-            
+
             // Background music (simple synthesized loop)
             this.createBackgroundMusic();
         } catch (e) {
@@ -57,7 +57,7 @@ const audioManager = {
 
     ensureAudioContext() {
         if (!this.initialized || !this.audioContext) return false;
-        
+
         // Resume audio context if suspended (required by browsers)
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume().catch(e => console.warn('Failed to resume audio:', e));
@@ -108,7 +108,7 @@ const audioManager = {
 
     playNote(frequency, startTime, duration) {
         if (!this.initialized || !this.audioContext) return;
-        
+
         try {
             const oscillator = this.audioContext.createOscillator();
             const gainNode = this.audioContext.createGain();
@@ -135,61 +135,61 @@ const audioManager = {
         try {
             const oscillator = this.audioContext.createOscillator();
             const gainNode = this.audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(this.audioContext.destination);
 
             const now = this.audioContext.currentTime;
 
-            switch(type) {
-            case 'jump':
-                oscillator.frequency.setValueAtTime(400, now);
-                oscillator.frequency.exponentialRampToValueAtTime(600, now + 0.1);
-                gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                oscillator.start(now);
-                oscillator.stop(now + 0.1);
-                break;
-            
-            case 'dash':
-                oscillator.frequency.setValueAtTime(200, now);
-                oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.2);
-                oscillator.type = 'sawtooth';
-                gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                oscillator.start(now);
-                oscillator.stop(now + 0.2);
-                break;
-            
-            case 'destroy':
-                oscillator.frequency.setValueAtTime(800, now);
-                oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
-                oscillator.type = 'square';
-                gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume * 0.7, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                oscillator.start(now);
-                oscillator.stop(now + 0.15);
-                break;
-            
-            case 'hit':
-                oscillator.frequency.setValueAtTime(150, now);
-                oscillator.frequency.exponentialRampToValueAtTime(50, now + 0.3);
-                oscillator.type = 'sawtooth';
-                gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                oscillator.start(now);
-                oscillator.stop(now + 0.3);
-                break;
-            
-            case 'powerup':
-                oscillator.frequency.setValueAtTime(600, now);
-                oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
-                oscillator.type = 'sine';
-                gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume * 0.6, now);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                oscillator.start(now);
-                oscillator.stop(now + 0.3);
-                break;
+            switch (type) {
+                case 'jump':
+                    oscillator.frequency.setValueAtTime(400, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                    gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.1);
+                    break;
+
+                case 'dash':
+                    oscillator.frequency.setValueAtTime(200, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.2);
+                    break;
+
+                case 'destroy':
+                    oscillator.frequency.setValueAtTime(800, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+                    oscillator.type = 'square';
+                    gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume * 0.7, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.15);
+                    break;
+
+                case 'hit':
+                    oscillator.frequency.setValueAtTime(150, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.3);
+                    break;
+
+                case 'powerup':
+                    oscillator.frequency.setValueAtTime(600, now);
+                    oscillator.frequency.exponentialRampToValueAtTime(1200, now + 0.3);
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(CONFIG.audio.sfxVolume * 0.6, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.3);
+                    break;
             }
         } catch (e) {
             console.warn('Sound playback error:', e);
@@ -221,7 +221,23 @@ const game = {
     scoreMultiplier: 1,
     invincible: false,
     invincibleTime: 0,
-    dpr: 1
+    dpr: 1,
+    // Visual effects
+    screenShake: {
+        intensity: 0,
+        duration: 0,
+        startTime: 0
+    },
+    redFlash: {
+        intensity: 0,
+        duration: 0,
+        startTime: 0
+    },
+    hitFlash: {
+        active: false,
+        startTime: 0,
+        duration: 500 // Brief invincibility flash after hit
+    }
 };
 
 // Asset Manager (loads SVG sprites for canvas drawImage)
@@ -375,16 +391,16 @@ class Player {
 
     checkObstacleCollision(obstacle) {
         if (obstacle.destroyed) return false;
-        
+
         const playerCenterX = this.x + this.width / 2;
         const playerCenterY = this.y + this.height / 2;
         const obstacleCenterX = obstacle.x + obstacle.size / 2;
         const obstacleCenterY = obstacle.y + obstacle.size / 2;
-        
+
         const dx = playerCenterX - obstacleCenterX;
         const dy = playerCenterY - obstacleCenterY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         return distance < (this.width / 2 + obstacle.size / 2) * 0.8;
     }
 
@@ -564,6 +580,18 @@ class Player {
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
 
+        // Hit flash effect (brief invincibility flash after taking damage)
+        if (game.hitFlash.active) {
+            const elapsed = Date.now() - game.hitFlash.startTime;
+            const flashProgress = elapsed / game.hitFlash.duration;
+            // Flashing effect: alternate between normal and white/red tint
+            const flashValue = Math.sin(flashProgress * Math.PI * 10) * 0.5 + 0.5;
+            ctx.globalAlpha = 0.5 + flashValue * 0.5;
+            if (flashValue > 0.7) {
+                ctx.filter = 'brightness(1.5) saturate(1.5)';
+            }
+        }
+
         // Dash effect
         if (this.isDashing) {
             ctx.shadowBlur = 30;
@@ -629,7 +657,7 @@ class Platform {
         gradient.addColorStop(0, '#ff1493');
         gradient.addColorStop(0.5, '#9400d3');
         gradient.addColorStop(1, '#4b0082');
-        
+
         ctx.fillStyle = gradient;
         ctx.shadowBlur = 10;
         ctx.shadowColor = 'rgba(255, 20, 147, 0.5)';
@@ -647,21 +675,21 @@ class Platform {
     drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
         let rot = Math.PI / 2 * 3;
         let step = Math.PI / spikes;
-        
+
         ctx.save();
         ctx.fillStyle = '#ffff00';
         ctx.shadowBlur = 5;
         ctx.shadowColor = '#ffff00';
         ctx.beginPath();
         ctx.moveTo(x, y - outerRadius);
-        
+
         for (let i = 0; i < spikes; i++) {
             ctx.lineTo(x + Math.cos(rot) * outerRadius, y + Math.sin(rot) * outerRadius);
             rot += step;
             ctx.lineTo(x + Math.cos(rot) * innerRadius, y + Math.sin(rot) * innerRadius);
             rot += step;
         }
-        
+
         ctx.lineTo(x, y - outerRadius);
         ctx.closePath();
         ctx.fill();
@@ -771,7 +799,7 @@ class PowerUp {
         ctx.rotate(this.rotation);
 
         // Different appearance based on type
-        switch(this.type) {
+        switch (this.type) {
             case 'invincibility':
                 // Golden star
                 ctx.fillStyle = '#ffd700';
@@ -779,7 +807,7 @@ class PowerUp {
                 ctx.shadowColor = '#ffd700';
                 this.drawStar(ctx, 0, 0, 5, this.size / 2 + pulseSize, this.size / 4);
                 break;
-            
+
             case 'multiplier':
                 // Purple diamond
                 ctx.fillStyle = '#9400d3';
@@ -792,7 +820,7 @@ class PowerUp {
                 ctx.lineTo(-(this.size / 2 + pulseSize), 0);
                 ctx.closePath();
                 ctx.fill();
-                
+
                 // 2x text
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 14px Arial';
@@ -800,7 +828,7 @@ class PowerUp {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('2x', 0, 0);
                 break;
-            
+
             case 'life':
                 // Red heart
                 ctx.fillStyle = '#ff1493';
@@ -822,17 +850,17 @@ class PowerUp {
     drawStar(ctx, x, y, spikes, outerRadius, innerRadius) {
         let rot = Math.PI / 2 * 3;
         let step = Math.PI / spikes;
-        
+
         ctx.beginPath();
         ctx.moveTo(x, y - outerRadius);
-        
+
         for (let i = 0; i < spikes; i++) {
             ctx.lineTo(x + Math.cos(rot) * outerRadius, y + Math.sin(rot) * outerRadius);
             rot += step;
             ctx.lineTo(x + Math.cos(rot) * innerRadius, y + Math.sin(rot) * innerRadius);
             rot += step;
         }
-        
+
         ctx.lineTo(x, y - outerRadius);
         ctx.closePath();
         ctx.fill();
@@ -920,13 +948,13 @@ const gameManager = {
             this.setupEventListeners();
             this.createBackgroundStars();
             this.updateUI();
-            
+
             // Update menu high score
             const menuHighScore = document.getElementById('menu-high-score');
             if (menuHighScore) {
                 menuHighScore.textContent = game.highScore;
             }
-            
+
             this.gameLoop();
         } catch (e) {
             console.error('Game initialization failed:', e);
@@ -996,6 +1024,40 @@ const gameManager = {
             console.error('Restart button not found!');
         }
 
+        // Pause menu buttons
+        const resumeBtn = document.getElementById('resume-btn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (game.state === 'paused') {
+                    this.togglePause();
+                }
+            });
+        }
+
+        const restartFromPauseBtn = document.getElementById('restart-from-pause-btn');
+        if (restartFromPauseBtn) {
+            restartFromPauseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                audioManager.ensureAudioContext();
+                this.hidePauseMenu();
+                this.startGame();
+            });
+        }
+
+        const quitBtn = document.getElementById('quit-btn');
+        if (quitBtn) {
+            quitBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.hidePauseMenu();
+                game.state = 'menu';
+                document.getElementById('start-screen').classList.remove('hidden');
+                document.getElementById('game-over-screen').classList.add('hidden');
+                audioManager.stopBackgroundMusic();
+                this.updateUI();
+            });
+        }
+
         // Mobile touch controls
         // IMPORTANT: passive:false so preventDefault() actually blocks scroll/zoom on mobile
         game.canvas.addEventListener(
@@ -1048,7 +1110,7 @@ const gameManager = {
         };
 
         window.addEventListener('resize', handleResizeEvent);
-        
+
         // Also listen for orientation change (better mobile support)
         window.addEventListener('orientationchange', () => {
             // Orientation change needs a slight delay for accurate dimensions
@@ -1071,7 +1133,7 @@ const gameManager = {
         // CSS keeps it responsive
         game.canvas.style.width = '100%';
         game.canvas.style.height = 'auto';
-        
+
         // Log orientation for debugging
         if (window.matchMedia("(orientation: portrait)").matches) {
             console.log('Orientation: Portrait');
@@ -1088,7 +1150,7 @@ const gameManager = {
 
     startGame() {
         console.log('Starting game...');
-        
+
         try {
             game.state = 'playing';
             game.score = 0;
@@ -1097,6 +1159,12 @@ const gameManager = {
             game.scoreMultiplier = 1;
             game.invincible = false;
             game.invincibleTime = 0;
+            // Reset visual effects
+            game.screenShake.intensity = 0;
+            game.screenShake.duration = 0;
+            game.redFlash.intensity = 0;
+            game.redFlash.duration = 0;
+            game.hitFlash.active = false;
 
             this.player = new Player();
             this.platforms = [];
@@ -1113,6 +1181,7 @@ const gameManager = {
 
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-over-screen').classList.add('hidden');
+            this.hidePauseMenu();
 
             // Start music (if available)
             try {
@@ -1122,7 +1191,7 @@ const gameManager = {
             }
 
             this.updateUI();
-            
+
             console.log('Game started successfully!');
         } catch (e) {
             console.error('Error starting game:', e);
@@ -1133,8 +1202,26 @@ const gameManager = {
     togglePause() {
         if (game.state === 'playing') {
             game.state = 'paused';
+            this.showPauseMenu();
         } else if (game.state === 'paused') {
             game.state = 'playing';
+            this.hidePauseMenu();
+        }
+    },
+
+    showPauseMenu() {
+        const pauseScreen = document.getElementById('pause-screen');
+        const pauseScore = document.getElementById('pause-score');
+        if (pauseScreen && pauseScore) {
+            pauseScore.textContent = Math.floor(game.score);
+            pauseScreen.classList.remove('hidden');
+        }
+    },
+
+    hidePauseMenu() {
+        const pauseScreen = document.getElementById('pause-screen');
+        if (pauseScreen) {
+            pauseScreen.classList.add('hidden');
         }
     },
 
@@ -1144,11 +1231,24 @@ const gameManager = {
         const deltaTime = currentTime - game.lastTime;
         game.lastTime = currentTime;
 
+        // Calculate screen shake offset
+        let shakeX = 0;
+        let shakeY = 0;
+        if (game.screenShake.intensity > 0 && (game.state === 'playing' || game.state === 'paused' || game.state === 'gameOver')) {
+            // Allow shake during playing, paused, and gameOver (for death shake)
+            shakeX = (Math.random() - 0.5) * game.screenShake.intensity;
+            shakeY = (Math.random() - 0.5) * game.screenShake.intensity;
+        } else if (game.state === 'menu') {
+            // Stop shake immediately when in menu
+            game.screenShake.intensity = 0;
+            game.screenShake.duration = 0;
+        }
+
         // Clear canvas (reset transform because DPR scaling is applied)
         game.ctx.setTransform(1, 0, 0, 1, 0, 0);
         game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        // Apply DPR transform so all drawing uses logical coordinates
-        game.ctx.setTransform(game.dpr, 0, 0, game.dpr, 0, 0);
+        // Apply DPR transform and screen shake offset
+        game.ctx.setTransform(game.dpr, 0, 0, game.dpr, shakeX * game.dpr, shakeY * game.dpr);
 
         // Draw background gradient
         const gradient = game.ctx.createLinearGradient(0, 0, 0, CONFIG.canvas.height);
@@ -1168,21 +1268,30 @@ const gameManager = {
             this.update();
             this.draw();
         } else if (game.state === 'paused') {
+            // Draw game state (frozen) but don't update
             this.draw();
-            // Draw paused text
-            game.ctx.save();
-            game.ctx.fillStyle = 'white';
-            game.ctx.font = 'bold 48px Arial';
-            game.ctx.textAlign = 'center';
-            game.ctx.fillText('PAUSED', CONFIG.canvas.width / 2, CONFIG.canvas.height / 2);
-            game.ctx.restore();
-        } else if (game.state === 'gameOver' || game.state === 'menu') {
+        } else if (game.state === 'gameOver') {
+            // Update visual effects even during game over (for death shake to fade out)
+            this.updateVisualEffects();
+            // Draw frozen game state
+            this.draw();
+        } else if (game.state === 'menu') {
             // Only draw background, don't draw game objects
-            // The UI overlay will handle the menu/game over screens
+            // The UI overlay will handle the menu screens
+        }
+
+        // Draw red flash overlay (after everything else)
+        if (game.redFlash.intensity > 0) {
+            game.ctx.setTransform(1, 0, 0, 1, 0, 0);
+            game.ctx.fillStyle = `rgba(255, 0, 0, ${game.redFlash.intensity * 0.5})`;
+            game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
         }
     },
 
     update() {
+        // Update visual effects
+        this.updateVisualEffects();
+
         // Update player
         const collision = this.player.update(this.platforms, this.obstacles);
 
@@ -1201,7 +1310,7 @@ const gameManager = {
 
         // Remove off-screen platforms and create new ones
         this.platforms = this.platforms.filter(p => p.x + p.width > -100);
-        
+
         if (this.platforms.length < 5) {
             const lastPlatform = this.platforms[this.platforms.length - 1];
             const gap = CONFIG.platform.minGap + Math.random() * (CONFIG.platform.maxGap - CONFIG.platform.minGap);
@@ -1221,7 +1330,7 @@ const gameManager = {
                 let type = 'star';
                 if (rand > 0.7) type = 'floating';
                 else if (rand > 0.85) type = 'moving';
-                
+
                 this.obstacles.push(new Obstacle(
                     platform.x + platform.width / 2,
                     platform.y - 60,
@@ -1249,7 +1358,7 @@ const gameManager = {
                 let type = 'invincibility';
                 if (rand > 0.4) type = 'multiplier';
                 else if (rand > 0.7) type = 'life';
-                
+
                 this.powerups.push(new PowerUp(
                     platform.x + platform.width / 2,
                     platform.y - 80,
@@ -1269,12 +1378,12 @@ const gameManager = {
 
     checkPowerUpCollision(powerup) {
         if (powerup.collected) return false;
-        
+
         const player = this.player;
         const dx = (player.x + player.width / 2) - (powerup.x + powerup.size / 2);
         const dy = (player.y + player.height / 2) - (powerup.y + powerup.size / 2);
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         return distance < (player.width / 2 + powerup.size / 2);
     },
 
@@ -1282,19 +1391,19 @@ const gameManager = {
         powerup.collected = true;
         audioManager.playSound('powerup');
 
-        switch(powerup.type) {
+        switch (powerup.type) {
             case 'invincibility':
                 game.invincible = true;
                 game.invincibleTime = Date.now();
                 break;
-            
+
             case 'multiplier':
                 game.scoreMultiplier = 2;
                 setTimeout(() => {
                     game.scoreMultiplier = 1;
                 }, 5000);
                 break;
-            
+
             case 'life':
                 if (game.wishes < 3) {
                     game.wishes++;
@@ -1343,10 +1452,40 @@ const gameManager = {
     },
 
     handleCollision(type) {
+        // If invincible and falling, teleport player back to safety
+        if (game.invincible && type === 'fell') {
+            // Find the nearest platform or reset to safe position
+            let safeY = 200;
+            let safeX = this.player.x;
+
+            // Try to find a platform to land on
+            for (let platform of this.platforms) {
+                if (platform.x <= this.player.x && platform.x + platform.width >= this.player.x) {
+                    safeY = platform.y - this.player.height;
+                    safeX = this.player.x;
+                    break;
+                }
+            }
+
+            // Teleport player back
+            this.player.y = safeY;
+            this.player.velocityY = 0;
+            this.player.velocityX = 0;
+            this.player.isDashing = false;
+            return; // Don't process as death
+        }
+
         if (!game.invincible) {
             game.wishes--;
             audioManager.playSound('hit');
-            
+
+            // Trigger visual effects
+            this.triggerScreenShake(15, 400); // intensity, duration in ms
+            this.triggerRedFlash(0.6, 300); // intensity, duration in ms
+            this.createHitEffect(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
+            game.hitFlash.active = true;
+            game.hitFlash.startTime = Date.now();
+
             if (game.wishes <= 0) {
                 // Reset player state before game over
                 if (this.player) {
@@ -1366,18 +1505,93 @@ const gameManager = {
         }
     },
 
+    triggerScreenShake(intensity, duration) {
+        game.screenShake.intensity = intensity;
+        game.screenShake.duration = duration;
+        game.screenShake.startTime = Date.now();
+    },
+
+    triggerRedFlash(intensity, duration) {
+        game.redFlash.intensity = intensity;
+        game.redFlash.duration = duration;
+        game.redFlash.startTime = Date.now();
+    },
+
+    createHitEffect(x, y) {
+        // Create heart-breaking particle effect
+        for (let i = 0; i < 30; i++) {
+            const angle = (Math.PI * 2 * i) / 30;
+            const speed = Math.random() * 8 + 4;
+            const hue = Math.random() * 60 + 320; // Pink to red colors
+            this.player.particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed - game.scrollSpeed,
+                vy: Math.sin(angle) * speed,
+                size: Math.random() * 8 + 4,
+                life: 1.0,
+                hue: hue
+            });
+        }
+    },
+
+    updateVisualEffects() {
+        const currentTime = Date.now();
+
+        // Update screen shake
+        if (game.screenShake.duration > 0) {
+            const elapsed = currentTime - game.screenShake.startTime;
+            if (elapsed < game.screenShake.duration) {
+                const progress = elapsed / game.screenShake.duration;
+                game.screenShake.intensity = game.screenShake.intensity * (1 - progress);
+            } else {
+                // Shake duration complete - stop it
+                game.screenShake.intensity = 0;
+                game.screenShake.duration = 0;
+            }
+        }
+
+        // Update red flash
+        if (game.redFlash.duration > 0) {
+            const elapsed = currentTime - game.redFlash.startTime;
+            if (elapsed < game.redFlash.duration) {
+                const progress = elapsed / game.redFlash.duration;
+                game.redFlash.intensity = game.redFlash.intensity * (1 - progress);
+            } else {
+                // Flash duration complete - stop it
+                game.redFlash.intensity = 0;
+                game.redFlash.duration = 0;
+            }
+        }
+
+        // Update hit flash
+        if (game.hitFlash.active) {
+            const elapsed = currentTime - game.hitFlash.startTime;
+            if (elapsed > game.hitFlash.duration) {
+                game.hitFlash.active = false;
+            }
+        }
+    },
+
     gameOver() {
         game.state = 'gameOver';
         audioManager.stopBackgroundMusic();
-        
+
         // Clear all power-up states to prevent bugs
         game.invincible = false;
         game.invincibleTime = 0;
         game.scoreMultiplier = 1;
-        
+
+        // Trigger a short death shake (stops automatically after duration)
+        this.triggerScreenShake(20, 250); // Short, intense shake for death
+        this.triggerRedFlash(0.8, 200); // Strong red flash for death
+
+        // Stop hit flash immediately
+        game.hitFlash.active = false;
+
         const finalScore = Math.floor(game.score);
         document.getElementById('final-score').textContent = finalScore;
-        
+
         // Check and save high score
         const isNewHighScore = storageManager.saveHighScore(finalScore);
         if (isNewHighScore) {
@@ -1386,15 +1600,16 @@ const gameManager = {
         } else {
             document.getElementById('new-high-score').classList.add('hidden');
         }
-        
+
         document.getElementById('game-over-screen').classList.remove('hidden');
+        this.hidePauseMenu();
         this.updateUI();
     },
 
     updateUI() {
         document.getElementById('score').textContent = Math.floor(game.score);
         document.getElementById('high-score').textContent = game.highScore;
-        
+
         const wishesText = '❤️'.repeat(game.wishes) + '🖤'.repeat(3 - game.wishes);
         document.getElementById('wishes').textContent = wishesText;
 
