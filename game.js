@@ -222,6 +222,7 @@ const game = {
     invincible: false,
     invincibleTime: 0,
     dpr: 1,
+    selectedSkin: 0, // 0 = unicorn.png, 1-5 = unicorn1-5.png
     // Visual effects
     screenShake: {
         intensity: 0,
@@ -240,12 +241,19 @@ const game = {
     }
 };
 
-// Asset Manager (loads SVG sprites for canvas drawImage)
+// Asset Manager (loads unicorn sprites)
 const assets = {
-    unicorn: {
-        img: null,
-        loaded: false,
-        failed: false
+    unicorns: [
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn.png' },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn1.png' },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn2.png' },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn3.png' },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn4.png' },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn5.png' }
+    ],
+    // Legacy support
+    get unicorn() {
+        return this.unicorns[game.selectedSkin] || this.unicorns[0];
     }
 };
 
@@ -261,7 +269,17 @@ const storageManager = {
     },
 
     getHighScore() {
-        return parseInt(localStorage.getItem('unicornAttackHighScore') || '0');
+        const saved = localStorage.getItem('unicornAttackHighScore');
+        return saved ? parseInt(saved, 10) : 0;
+    },
+
+    saveSelectedSkin(skinIndex) {
+        localStorage.setItem('unicornAttackSkin', skinIndex.toString());
+    },
+
+    getSelectedSkin() {
+        const saved = localStorage.getItem('unicornAttackSkin');
+        return saved ? parseInt(saved, 10) : 0;
     }
 };
 
@@ -598,8 +616,8 @@ class Player {
             ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
         }
 
-        // Prefer SVG sprite if available, fallback to simple shape
-        const unicornSprite = assets?.unicorn;
+        // Use selected unicorn skin, fallback to simple shape
+        const unicornSprite = assets.unicorns[game.selectedSkin] || assets.unicorns[0];
         if (unicornSprite?.loaded && unicornSprite.img) {
             ctx.imageSmoothingEnabled = true;
             ctx.drawImage(unicornSprite.img, -this.width / 2, -this.height / 2, this.width, this.height);
@@ -922,8 +940,9 @@ const gameManager = {
             game.canvas.style.width = '100%';
             game.canvas.style.height = 'auto';
 
-            // Load high score
+            // Load high score and selected skin
             game.highScore = storageManager.getHighScore();
+            game.selectedSkin = storageManager.getSelectedSkin();
 
             // Initialize audio (non-blocking)
             try {
@@ -932,18 +951,20 @@ const gameManager = {
                 console.warn('Audio initialization failed, continuing without audio:', e);
             }
 
-            // Load sprite assets
-            assets.unicorn.img = new Image();
-            assets.unicorn.img.onload = () => {
-                assets.unicorn.loaded = true;
-                assets.unicorn.failed = false;
-            };
-            assets.unicorn.img.onerror = () => {
-                assets.unicorn.loaded = false;
-                assets.unicorn.failed = true;
-                console.warn('Failed to load unicorn sprite (assets/unicorn.png). Falling back to canvas shape.');
-            };
-            assets.unicorn.img.src = 'assets/unicorn.png';
+            // Load all unicorn sprite assets
+            assets.unicorns.forEach((unicorn, index) => {
+                unicorn.img = new Image();
+                unicorn.img.onload = () => {
+                    unicorn.loaded = true;
+                    unicorn.failed = false;
+                };
+                unicorn.img.onerror = () => {
+                    unicorn.loaded = false;
+                    unicorn.failed = true;
+                    console.warn(`Failed to load unicorn sprite ${index} (${unicorn.path}). Falling back to canvas shape.`);
+                };
+                unicorn.img.src = unicorn.path;
+            });
 
             this.setupEventListeners();
             this.createBackgroundStars();
@@ -954,6 +975,11 @@ const gameManager = {
             if (menuHighScore) {
                 menuHighScore.textContent = game.highScore;
             }
+
+            // Initialize skin selector UI (with delay to ensure DOM is ready)
+            setTimeout(() => {
+                this.updateSkinSelector();
+            }, 100);
 
             this.gameLoop();
         } catch (e) {
@@ -997,18 +1023,43 @@ const gameManager = {
             game.keys[e.code] = false;
         });
 
-        // Button controls
+        // Use direct event listeners for skin buttons (more reliable)
+        const skinButtons = document.querySelectorAll('.skin-btn');
+        if (skinButtons.length > 0) {
+            skinButtons.forEach(btn => {
+                const handleSkinClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const skinIndex = parseInt(btn.getAttribute('data-skin'), 10);
+                    if (!isNaN(skinIndex)) {
+                        console.log(`Skin ${skinIndex} selected`);
+                        gameManager.selectSkin(skinIndex);
+                    }
+                };
+                btn.addEventListener('click', handleSkinClick);
+            });
+            console.log(`✅ ${skinButtons.length} skin buttons initialized`);
+        } else {
+            console.warn('⚠️ No skin buttons found in DOM');
+        }
+
+        // Button controls - use direct event listeners with proper binding
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
-            startBtn.addEventListener('click', (e) => {
+            // Use arrow function to preserve 'this' context
+            const handleStartClick = (e) => {
                 console.log('Start button clicked');
                 e.preventDefault();
+                e.stopPropagation();
                 // Resume audio context on user interaction
                 audioManager.ensureAudioContext();
-                this.startGame();
-            });
+                gameManager.startGame();
+            };
+            
+            startBtn.addEventListener('click', handleStartClick);
+            console.log('✅ Start button initialized');
         } else {
-            console.error('Start button not found!');
+            console.error('❌ Start button not found!');
         }
 
         const restartBtn = document.getElementById('restart-btn');
@@ -1606,6 +1657,43 @@ const gameManager = {
         this.updateUI();
     },
 
+    selectSkin(skinIndex) {
+        if (skinIndex >= 0 && skinIndex < assets.unicorns.length) {
+            game.selectedSkin = skinIndex;
+            storageManager.saveSelectedSkin(skinIndex);
+            this.updateSkinSelector();
+        }
+    },
+
+    updateSkinSelector() {
+        const skinButtons = document.querySelectorAll('.skin-btn');
+        if (skinButtons.length > 0) {
+            skinButtons.forEach((btn, index) => {
+                if (index === game.selectedSkin) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+    },
+
+    attachButtonListeners() {
+        // Re-attach start button listener (only if needed)
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn && !startBtn.hasAttribute('data-listener-attached')) {
+            startBtn.setAttribute('data-listener-attached', 'true');
+            startBtn.addEventListener('click', (e) => {
+                console.log('Start button clicked (re-attached)');
+                e.preventDefault();
+                e.stopPropagation();
+                audioManager.ensureAudioContext();
+                this.startGame();
+            });
+            console.log('✅ Start button listener re-attached');
+        }
+    },
+
     updateUI() {
         document.getElementById('score').textContent = Math.floor(game.score);
         document.getElementById('high-score').textContent = game.highScore;
@@ -1635,7 +1723,24 @@ const gameManager = {
 // Initialize game when page loads
 window.addEventListener('load', () => {
     console.log('🦄 Robot Unicorn Attack - Initializing...');
-    gameManager.init();
-    console.log('✅ Game ready! Click START GAME to play.');
+    try {
+        gameManager.init();
+        console.log('✅ Game ready! Click START GAME to play.');
+        
+        // Test if buttons exist after initialization
+        setTimeout(() => {
+            const startBtn = document.getElementById('start-btn');
+            const skinBtns = document.querySelectorAll('.skin-btn');
+            console.log('🔍 Debug: Start button exists?', !!startBtn);
+            console.log('🔍 Debug: Skin buttons found:', skinBtns.length);
+            
+            if (startBtn) {
+                console.log('🔍 Debug: Start button computed style:', window.getComputedStyle(startBtn).pointerEvents);
+            }
+        }, 500);
+    } catch (error) {
+        console.error('❌ Error initializing game:', error);
+        alert('Failed to initialize game: ' + error.message);
+    }
 });
 
