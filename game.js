@@ -43,11 +43,9 @@ const audioManager = {
 
     init() {
         try {
-            // Create audio context for sound effects
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this.initialized = true;
 
-            // Background music (simple synthesized loop)
             this.createBackgroundMusic();
         } catch (e) {
             console.warn('Audio initialization failed:', e);
@@ -58,7 +56,6 @@ const audioManager = {
     ensureAudioContext() {
         if (!this.initialized || !this.audioContext) return false;
 
-        // Resume audio context if suspended (required by browsers)
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume().catch(e => console.warn('Failed to resume audio:', e));
         }
@@ -66,7 +63,6 @@ const audioManager = {
     },
 
     createBackgroundMusic() {
-        // Create a simple upbeat melody using Web Audio API
         this.musicPlaying = false;
     },
 
@@ -85,12 +81,12 @@ const audioManager = {
 
         try {
             const notes = [
-                { freq: 523.25, duration: 0.2 }, // C5
-                { freq: 587.33, duration: 0.2 }, // D5
-                { freq: 659.25, duration: 0.2 }, // E5
-                { freq: 783.99, duration: 0.2 }, // G5
-                { freq: 659.25, duration: 0.2 }, // E5
-                { freq: 783.99, duration: 0.4 }, // G5
+                { freq: 523.25, duration: 0.2 },
+                { freq: 587.33, duration: 0.2 },
+                { freq: 659.25, duration: 0.2 },
+                { freq: 783.99, duration: 0.2 },
+                { freq: 659.25, duration: 0.2 },
+                { freq: 783.99, duration: 0.4 },
             ];
 
             let currentTime = this.audioContext.currentTime;
@@ -211,7 +207,7 @@ const audioManager = {
 const game = {
     canvas: null,
     ctx: null,
-    state: 'menu', // menu, playing, paused, gameOver
+    state: 'menu',
     score: 0,
     wishes: 3,
     scrollSpeed: CONFIG.game.scrollSpeed,
@@ -222,8 +218,7 @@ const game = {
     invincible: false,
     invincibleTime: 0,
     dpr: 1,
-    selectedSkin: 0, // 0 = unicorn.png, 1-5 = unicorn1-5.png
-    // Visual effects
+    selectedSkin: 0,
     screenShake: {
         intensity: 0,
         duration: 0,
@@ -237,21 +232,20 @@ const game = {
     hitFlash: {
         active: false,
         startTime: 0,
-        duration: 500 // Brief invincibility flash after hit
+        duration: 500
     }
 };
 
 // Asset Manager (loads unicorn sprites)
 const assets = {
     unicorns: [
-        { img: null, loaded: false, failed: false, path: 'assets/unicorn.png' },
-        { img: null, loaded: false, failed: false, path: 'assets/unicorn1.png' },
-        { img: null, loaded: false, failed: false, path: 'assets/unicorn2.png' },
-        { img: null, loaded: false, failed: false, path: 'assets/unicorn3.png' },
-        { img: null, loaded: false, failed: false, path: 'assets/unicorn4.png' },
-        { img: null, loaded: false, failed: false, path: 'assets/unicorn5.png' }
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn.png', width: null, height: null },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn1.png', width: null, height: null },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn2.png', width: null, height: null },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn3.png', width: null, height: null },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn4.png', width: null, height: null },
+        { img: null, loaded: false, failed: false, path: 'assets/unicorn5.png', width: null, height: null }
     ],
-    // Legacy support
     get unicorn() {
         return this.unicorns[game.selectedSkin] || this.unicorns[0];
     }
@@ -299,7 +293,6 @@ class Player {
         this.lastDashTime = 0;
         this.particles = [];
         this.rotation = 0;
-        // Smooth rainbow ribbon trail (replaces bubble particles)
         this.trail = [];
         this.trailHue = 0;
     }
@@ -325,7 +318,6 @@ class Player {
     }
 
     update(platforms, obstacles) {
-        // Dash logic
         if (this.isDashing) {
             if (Date.now() - this.dashTime > CONFIG.player.dashDuration) {
                 this.isDashing = false;
@@ -333,16 +325,13 @@ class Player {
             }
         }
 
-        // Apply gravity
         if (!this.isGrounded) {
             this.velocityY += CONFIG.player.gravity;
         }
 
-        // Update position
         this.y += this.velocityY;
         this.x += this.velocityX;
 
-        // Keep player in bounds horizontally
         if (this.x > CONFIG.player.x) {
             this.x = CONFIG.player.x;
             this.velocityX = 0;
@@ -351,7 +340,6 @@ class Player {
             this.x = 50;
         }
 
-        // Rotation while in air
         if (!this.isGrounded && this.velocityY < 0) {
             this.rotation = Math.min(this.rotation + 0.05, 0.3);
         } else if (!this.isGrounded) {
@@ -360,7 +348,6 @@ class Player {
             this.rotation *= 0.9;
         }
 
-        // Platform collision
         this.isGrounded = false;
         for (let platform of platforms) {
             if (this.checkPlatformCollision(platform)) {
@@ -372,12 +359,10 @@ class Player {
             }
         }
 
-        // Check if fell off screen
         if (this.y > CONFIG.canvas.height) {
             return 'fell';
         }
 
-        // Obstacle collision
         for (let obstacle of obstacles) {
             if (this.checkObstacleCollision(obstacle)) {
                 if (this.isDashing || game.invincible) {
@@ -391,7 +376,6 @@ class Player {
             }
         }
 
-        // Update particles
         this.updateParticles();
 
         return null;
@@ -423,7 +407,6 @@ class Player {
     }
 
     updateParticles() {
-        // Rainbow ribbon trail points (instead of bubbles)
         if (game.state === 'playing') {
             this.trailHue = (this.trailHue + 6) % 360;
 
@@ -437,20 +420,17 @@ class Player {
                 hue: this.trailHue
             });
 
-            // Limit length for performance
             if (this.trail.length > 60) {
                 this.trail.shift();
             }
         }
 
-        // Update trail points so they drift left with world scroll
         this.trail = this.trail.filter(t => {
             t.x -= game.scrollSpeed;
             t.life -= 0.03;
             return t.life > 0;
         });
 
-        // Update and remove spark particles (used for explosions)
         this.particles = this.particles.filter(p => {
             p.x += p.vx;
             p.y += p.vy;
@@ -476,40 +456,34 @@ class Player {
     }
 
     draw(ctx) {
-        // Draw rainbow ribbon trail (7 crisp stripes like the classic game)
         if (this.trail.length > 1) {
             ctx.save();
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
 
             const stripes = [
-                '#ff0000', // Red
-                '#ff7a00', // Orange
-                '#ffe600', // Yellow
-                '#2dff4a', // Green
-                '#00e5ff', // Cyan
-                '#2a6bff', // Blue
-                '#b400ff'  // Violet
+                '#ff0000',
+                '#ff7a00',
+                '#ffe600',
+                '#2dff4a',
+                '#00e5ff',
+                '#2a6bff',
+                '#b400ff'
             ];
 
-            // Helper: draw a smooth curve through the trail points with an added y-offset
             const drawSmoothTrail = (yOffset) => {
                 ctx.beginPath();
                 const pts = this.trail;
-                // Move to first point
                 ctx.moveTo(pts[0].x, pts[0].y + yOffset);
-                // Quadratic smoothing: curve to midpoints
                 for (let i = 1; i < pts.length - 1; i++) {
                     const xc = (pts[i].x + pts[i + 1].x) / 2;
                     const yc = (pts[i].y + pts[i + 1].y) / 2 + yOffset;
                     ctx.quadraticCurveTo(pts[i].x, pts[i].y + yOffset, xc, yc);
                 }
-                // Final segment
                 const last = pts[pts.length - 1];
                 ctx.lineTo(last.x, last.y + yOffset);
             };
 
-            // Soft glow behind the whole rainbow (single stroke, not per-color blur)
             ctx.globalAlpha = 0.25;
             ctx.shadowBlur = 22;
             ctx.shadowColor = 'rgba(255,255,255,0.6)';
@@ -518,11 +492,10 @@ class Player {
             drawSmoothTrail(0);
             ctx.stroke();
 
-            // Draw 7 separate, clearly-visible stripes (no heavy blur so colors don't blend)
             ctx.globalAlpha = 0.95;
             ctx.shadowBlur = 0;
 
-            const stripeThickness = 4.2; // thickness of each band
+            const stripeThickness = 4.2;
             for (let i = 0; i < stripes.length; i++) {
                 const yOffset = (i - 3) * stripeThickness;
                 ctx.strokeStyle = stripes[i];
@@ -534,7 +507,7 @@ class Player {
             if (this.trail.length > 10) {
                 const pts = this.trail;
                 const shimmerLen = Math.min(14, pts.length - 2);
-                const t = Date.now() / 60; // speed
+                const t = Date.now() / 60;
                 const start = Math.floor(t % (pts.length - shimmerLen));
                 const end = start + shimmerLen;
 
@@ -544,10 +517,8 @@ class Player {
                 ctx.shadowBlur = 18;
                 ctx.shadowColor = 'rgba(255,255,255,0.9)';
 
-                // A thin highlight across the center of the rainbow
                 ctx.lineWidth = 3;
 
-                // Gradient so the highlight fades at the ends
                 const p0 = pts[start];
                 const p1 = pts[end - 1];
                 const grad = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
@@ -567,7 +538,6 @@ class Player {
                 ctx.lineTo(p1.x, p1.y);
                 ctx.stroke();
 
-                // Tiny sparkle point at the leading edge
                 ctx.globalAlpha = 0.9;
                 ctx.fillStyle = 'rgba(255,255,255,0.95)';
                 ctx.beginPath();
@@ -580,7 +550,6 @@ class Player {
             ctx.restore();
         }
 
-        // Draw explosion spark particles
         this.particles.forEach(p => {
             ctx.save();
             ctx.globalAlpha = p.life;
@@ -593,16 +562,13 @@ class Player {
             ctx.restore();
         });
 
-        // Draw player
         ctx.save();
         ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
 
-        // Hit flash effect (brief invincibility flash after taking damage)
         if (game.hitFlash.active) {
             const elapsed = Date.now() - game.hitFlash.startTime;
             const flashProgress = elapsed / game.hitFlash.duration;
-            // Flashing effect: alternate between normal and white/red tint
             const flashValue = Math.sin(flashProgress * Math.PI * 10) * 0.5 + 0.5;
             ctx.globalAlpha = 0.5 + flashValue * 0.5;
             if (flashValue > 0.7) {
@@ -610,23 +576,39 @@ class Player {
             }
         }
 
-        // Dash effect
         if (this.isDashing) {
             ctx.shadowBlur = 30;
             ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
         }
 
-        // Use selected unicorn skin, fallback to simple shape
         const unicornSprite = assets.unicorns[game.selectedSkin] || assets.unicorns[0];
         if (unicornSprite?.loaded && unicornSprite.img) {
             ctx.imageSmoothingEnabled = true;
-            ctx.drawImage(unicornSprite.img, -this.width / 2, -this.height / 2, this.width, this.height);
+
+            const targetWidth = this.width;
+            const targetHeight = this.height;
+
+            let drawWidth = targetWidth;
+            let drawHeight = targetHeight;
+
+            if (unicornSprite.width && unicornSprite.height) {
+                const imageAspect = unicornSprite.width / unicornSprite.height;
+                const targetAspect = targetWidth / targetHeight;
+
+                if (imageAspect > targetAspect) {
+                    drawWidth = targetWidth;
+                    drawHeight = targetWidth / imageAspect;
+                } else {
+                    drawHeight = targetHeight;
+                    drawWidth = targetHeight * imageAspect;
+                }
+            }
+
+            ctx.drawImage(unicornSprite.img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
         } else {
-            // Body (fallback unicorn shape)
             ctx.fillStyle = this.isDashing ? '#ffffff' : '#e0e0e0';
             ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
 
-            // Horn
             ctx.fillStyle = '#ffd700';
             ctx.beginPath();
             ctx.moveTo(-this.width / 2 + 10, -this.height / 2);
@@ -634,13 +616,11 @@ class Player {
             ctx.lineTo(-this.width / 2 + 15, -this.height / 2);
             ctx.fill();
 
-            // Eye
             ctx.fillStyle = '#ff1493';
             ctx.beginPath();
             ctx.arc(-this.width / 2 + 15, -this.height / 2 + 15, 5, 0, Math.PI * 2);
             ctx.fill();
 
-            // Legs (simple lines)
             ctx.strokeStyle = '#c0c0c0';
             ctx.lineWidth = 4;
             const legOffset = Math.sin(Date.now() / 100) * 5;
@@ -670,7 +650,6 @@ class Platform {
     }
 
     draw(ctx) {
-        // Platform with gradient
         const gradient = ctx.createLinearGradient(this.x, this.y, this.x, this.y + this.height);
         gradient.addColorStop(0, '#ff1493');
         gradient.addColorStop(0.5, '#9400d3');
@@ -682,7 +661,6 @@ class Platform {
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.shadowBlur = 0;
 
-        // Stars on platform
         for (let i = 0; i < this.width; i += 50) {
             const starX = this.x + i + 25;
             const starY = this.y - 5;
@@ -715,7 +693,6 @@ class Platform {
     }
 }
 
-// Obstacle Class (Stars to break through)
 class Obstacle {
     constructor(x, y, type = 'star') {
         this.x = x;
@@ -723,7 +700,7 @@ class Obstacle {
         this.size = 40;
         this.destroyed = false;
         this.rotation = 0;
-        this.type = type; // 'star', 'floating', 'moving'
+        this.type = type;
         this.initialY = y;
         this.time = 0;
     }
@@ -733,7 +710,6 @@ class Obstacle {
         this.rotation += 0.05;
         this.time += 0.05;
 
-        // Different movement patterns
         if (this.type === 'floating') {
             this.y = this.initialY + Math.sin(this.time) * 30;
         } else if (this.type === 'moving') {
@@ -748,7 +724,6 @@ class Obstacle {
         ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
         ctx.rotate(this.rotation);
 
-        // Different colors for different types
         let color = '#ff00ff';
         if (this.type === 'floating') {
             color = '#00ffff';
@@ -756,7 +731,6 @@ class Obstacle {
             color = '#ff9900';
         }
 
-        // Draw star obstacle
         const spikes = 5;
         const outerRadius = this.size / 2;
         const innerRadius = this.size / 4;
@@ -780,7 +754,6 @@ class Obstacle {
         ctx.closePath();
         ctx.fill();
 
-        // Inner glow
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.arc(0, 0, innerRadius / 2, 0, Math.PI * 2);
@@ -790,13 +763,12 @@ class Obstacle {
     }
 }
 
-// PowerUp Class
 class PowerUp {
     constructor(x, y, type) {
         this.x = x;
         this.y = y;
         this.size = 30;
-        this.type = type; // 'invincibility', 'multiplier', 'life'
+        this.type = type;
         this.collected = false;
         this.rotation = 0;
         this.pulse = 0;
@@ -816,10 +788,8 @@ class PowerUp {
         ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
         ctx.rotate(this.rotation);
 
-        // Different appearance based on type
         switch (this.type) {
             case 'invincibility':
-                // Golden star
                 ctx.fillStyle = '#ffd700';
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#ffd700';
@@ -827,7 +797,6 @@ class PowerUp {
                 break;
 
             case 'multiplier':
-                // Purple diamond
                 ctx.fillStyle = '#9400d3';
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#9400d3';
@@ -839,7 +808,6 @@ class PowerUp {
                 ctx.closePath();
                 ctx.fill();
 
-                // 2x text
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 14px Arial';
                 ctx.textAlign = 'center';
@@ -848,7 +816,6 @@ class PowerUp {
                 break;
 
             case 'life':
-                // Red heart
                 ctx.fillStyle = '#ff1493';
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#ff1493';
@@ -885,7 +852,6 @@ class PowerUp {
     }
 }
 
-// Background stars
 class Star {
     constructor() {
         this.x = Math.random() * CONFIG.canvas.width;
@@ -916,7 +882,6 @@ class Star {
     }
 }
 
-// Game Manager
 const gameManager = {
     player: null,
     platforms: [],
@@ -930,33 +895,29 @@ const gameManager = {
         try {
             game.canvas = document.getElementById('gameCanvas');
             game.ctx = game.canvas.getContext('2d');
-            // HiDPI / mobile-friendly rendering:
-            // - Keep game logic in fixed logical coords (CONFIG.canvas.*)
-            // - Render to a higher-resolution backing store using devicePixelRatio
             game.dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
             game.canvas.width = Math.floor(CONFIG.canvas.width * game.dpr);
             game.canvas.height = Math.floor(CONFIG.canvas.height * game.dpr);
-            // CSS keeps it responsive
             game.canvas.style.width = '100%';
             game.canvas.style.height = 'auto';
 
-            // Load high score and selected skin
             game.highScore = storageManager.getHighScore();
             game.selectedSkin = storageManager.getSelectedSkin();
 
-            // Initialize audio (non-blocking)
             try {
                 audioManager.init();
             } catch (e) {
                 console.warn('Audio initialization failed, continuing without audio:', e);
             }
 
-            // Load all unicorn sprite assets
             assets.unicorns.forEach((unicorn, index) => {
                 unicorn.img = new Image();
                 unicorn.img.onload = () => {
                     unicorn.loaded = true;
                     unicorn.failed = false;
+                    unicorn.width = unicorn.img.naturalWidth || unicorn.img.width;
+                    unicorn.height = unicorn.img.naturalHeight || unicorn.img.height;
+                    console.log(`✅ Loaded unicorn ${index}: ${unicorn.width}x${unicorn.height}`);
                 };
                 unicorn.img.onerror = () => {
                     unicorn.loaded = false;
@@ -970,13 +931,11 @@ const gameManager = {
             this.createBackgroundStars();
             this.updateUI();
 
-            // Update menu high score
             const menuHighScore = document.getElementById('menu-high-score');
             if (menuHighScore) {
                 menuHighScore.textContent = game.highScore;
             }
 
-            // Initialize skin selector UI (with delay to ensure DOM is ready)
             setTimeout(() => {
                 this.updateSkinSelector();
             }, 100);
@@ -989,18 +948,15 @@ const gameManager = {
     },
 
     setupEventListeners() {
-        // Keyboard controls
         document.addEventListener('keydown', (e) => {
             game.keys[e.code] = true;
 
-            // Allow pause toggle from both playing and paused states
             if (e.code === 'KeyP' && (game.state === 'playing' || game.state === 'paused')) {
                 e.preventDefault();
                 this.togglePause();
                 return;
             }
 
-            // Optional: Space also resumes from pause (nice UX)
             if (e.code === 'Space' && game.state === 'paused') {
                 e.preventDefault();
                 this.togglePause();
@@ -1023,7 +979,6 @@ const gameManager = {
             game.keys[e.code] = false;
         });
 
-        // Use direct event listeners for skin buttons (more reliable)
         const skinButtons = document.querySelectorAll('.skin-btn');
         if (skinButtons.length > 0) {
             skinButtons.forEach(btn => {
@@ -1043,19 +998,16 @@ const gameManager = {
             console.warn('⚠️ No skin buttons found in DOM');
         }
 
-        // Button controls - use direct event listeners with proper binding
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
-            // Use arrow function to preserve 'this' context
             const handleStartClick = (e) => {
                 console.log('Start button clicked');
                 e.preventDefault();
                 e.stopPropagation();
-                // Resume audio context on user interaction
                 audioManager.ensureAudioContext();
                 gameManager.startGame();
             };
-            
+
             startBtn.addEventListener('click', handleStartClick);
             console.log('✅ Start button initialized');
         } else {
@@ -1067,7 +1019,6 @@ const gameManager = {
             restartBtn.addEventListener('click', (e) => {
                 console.log('Restart button clicked');
                 e.preventDefault();
-                // Resume audio context on user interaction
                 audioManager.ensureAudioContext();
                 this.startGame();
             });
@@ -1075,7 +1026,6 @@ const gameManager = {
             console.error('Restart button not found!');
         }
 
-        // Pause menu buttons
         const resumeBtn = document.getElementById('resume-btn');
         if (resumeBtn) {
             resumeBtn.addEventListener('click', (e) => {
@@ -1109,8 +1059,6 @@ const gameManager = {
             });
         }
 
-        // Mobile touch controls
-        // IMPORTANT: passive:false so preventDefault() actually blocks scroll/zoom on mobile
         game.canvas.addEventListener(
             'touchstart',
             (e) => {
@@ -1120,7 +1068,6 @@ const gameManager = {
                 this.touchStartX = touch.clientX;
 
                 if (game.state === 'playing') {
-                    // Tap on right side = dash, anywhere else = jump
                     const rect = game.canvas.getBoundingClientRect();
                     const x = touch.clientX - rect.left;
                     if (x > rect.width * 0.7) {
@@ -1141,7 +1088,6 @@ const gameManager = {
             { passive: false }
         );
 
-        // Mute button
         const muteBtn = document.getElementById('mute-btn');
         if (muteBtn) {
             muteBtn.addEventListener('click', () => {
@@ -1150,10 +1096,8 @@ const gameManager = {
             });
         }
 
-        // Window resize handler for mobile orientation changes
         let resizeTimeout;
         const handleResizeEvent = () => {
-            // Debounce resize events
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 this.handleResize();
@@ -1162,30 +1106,24 @@ const gameManager = {
 
         window.addEventListener('resize', handleResizeEvent);
 
-        // Also listen for orientation change (better mobile support)
         window.addEventListener('orientationchange', () => {
-            // Orientation change needs a slight delay for accurate dimensions
             setTimeout(() => {
                 this.handleResize();
             }, 300);
         });
 
-        // Listen for screen orientation API if available
         if (screen.orientation) {
             screen.orientation.addEventListener('change', handleResizeEvent);
         }
     },
 
     handleResize() {
-        // Update canvas dimensions with device pixel ratio
         game.dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
         game.canvas.width = Math.floor(CONFIG.canvas.width * game.dpr);
         game.canvas.height = Math.floor(CONFIG.canvas.height * game.dpr);
-        // CSS keeps it responsive
         game.canvas.style.width = '100%';
         game.canvas.style.height = 'auto';
 
-        // Log orientation for debugging
         if (window.matchMedia("(orientation: portrait)").matches) {
             console.log('Orientation: Portrait');
         } else if (window.matchMedia("(orientation: landscape)").matches) {
@@ -1210,7 +1148,6 @@ const gameManager = {
             game.scoreMultiplier = 1;
             game.invincible = false;
             game.invincibleTime = 0;
-            // Reset visual effects
             game.screenShake.intensity = 0;
             game.screenShake.duration = 0;
             game.redFlash.intensity = 0;
@@ -1222,7 +1159,6 @@ const gameManager = {
             this.obstacles = [];
             this.powerups = [];
 
-            // Create initial platforms
             let x = 0;
             for (let i = 0; i < 5; i++) {
                 const width = CONFIG.platform.minWidth + Math.random() * (CONFIG.platform.maxWidth - CONFIG.platform.minWidth);
@@ -1234,7 +1170,6 @@ const gameManager = {
             document.getElementById('game-over-screen').classList.add('hidden');
             this.hidePauseMenu();
 
-            // Start music (if available)
             try {
                 audioManager.playBackgroundMusic();
             } catch (e) {
@@ -1282,26 +1217,20 @@ const gameManager = {
         const deltaTime = currentTime - game.lastTime;
         game.lastTime = currentTime;
 
-        // Calculate screen shake offset
         let shakeX = 0;
         let shakeY = 0;
         if (game.screenShake.intensity > 0 && (game.state === 'playing' || game.state === 'paused' || game.state === 'gameOver')) {
-            // Allow shake during playing, paused, and gameOver (for death shake)
             shakeX = (Math.random() - 0.5) * game.screenShake.intensity;
             shakeY = (Math.random() - 0.5) * game.screenShake.intensity;
         } else if (game.state === 'menu') {
-            // Stop shake immediately when in menu
             game.screenShake.intensity = 0;
             game.screenShake.duration = 0;
         }
 
-        // Clear canvas (reset transform because DPR scaling is applied)
         game.ctx.setTransform(1, 0, 0, 1, 0, 0);
         game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        // Apply DPR transform and screen shake offset
         game.ctx.setTransform(game.dpr, 0, 0, game.dpr, shakeX * game.dpr, shakeY * game.dpr);
 
-        // Draw background gradient
         const gradient = game.ctx.createLinearGradient(0, 0, 0, CONFIG.canvas.height);
         gradient.addColorStop(0, '#1a0033');
         gradient.addColorStop(0.5, '#330066');
@@ -1309,7 +1238,6 @@ const gameManager = {
         game.ctx.fillStyle = gradient;
         game.ctx.fillRect(0, 0, CONFIG.canvas.width, CONFIG.canvas.height);
 
-        // Draw background stars
         this.backgroundStars.forEach(star => {
             star.update();
             star.draw(game.ctx);
@@ -1319,19 +1247,13 @@ const gameManager = {
             this.update();
             this.draw();
         } else if (game.state === 'paused') {
-            // Draw game state (frozen) but don't update
             this.draw();
         } else if (game.state === 'gameOver') {
-            // Update visual effects even during game over (for death shake to fade out)
             this.updateVisualEffects();
-            // Draw frozen game state
             this.draw();
         } else if (game.state === 'menu') {
-            // Only draw background, don't draw game objects
-            // The UI overlay will handle the menu screens
         }
 
-        // Draw red flash overlay (after everything else)
         if (game.redFlash.intensity > 0) {
             game.ctx.setTransform(1, 0, 0, 1, 0, 0);
             game.ctx.fillStyle = `rgba(255, 0, 0, ${game.redFlash.intensity * 0.5})`;
@@ -1340,10 +1262,8 @@ const gameManager = {
     },
 
     update() {
-        // Update visual effects
         this.updateVisualEffects();
 
-        // Update player
         const collision = this.player.update(this.platforms, this.obstacles);
 
         if (collision) {
@@ -1351,15 +1271,12 @@ const gameManager = {
             return;
         }
 
-        // Check power-up effects duration
         if (game.invincible && Date.now() - game.invincibleTime > 5000) {
             game.invincible = false;
         }
 
-        // Update platforms
         this.platforms.forEach(platform => platform.update());
 
-        // Remove off-screen platforms and create new ones
         this.platforms = this.platforms.filter(p => p.x + p.width > -100);
 
         if (this.platforms.length < 5) {
@@ -1369,11 +1286,9 @@ const gameManager = {
             this.platforms.push(new Platform(lastPlatform.x + lastPlatform.width + gap, width));
         }
 
-        // Update obstacles
         this.obstacles.forEach(obstacle => obstacle.update());
         this.obstacles = this.obstacles.filter(o => o.x > -100 && !o.destroyed);
 
-        // Create new obstacles randomly with different types
         if (Math.random() < 0.015 && this.obstacles.length < 4) {
             const platform = this.platforms[Math.floor(Math.random() * Math.min(3, this.platforms.length))];
             if (platform) {
@@ -1390,18 +1305,15 @@ const gameManager = {
             }
         }
 
-        // Update power-ups
         this.powerups.forEach(powerup => powerup.update());
         this.powerups = this.powerups.filter(p => p.x > -100 && !p.collected);
 
-        // Check power-up collection
         for (let powerup of this.powerups) {
             if (this.checkPowerUpCollision(powerup)) {
                 this.collectPowerUp(powerup);
             }
         }
 
-        // Create new power-ups randomly
         if (Math.random() < 0.005 && this.powerups.length < 2) {
             const platform = this.platforms[Math.floor(Math.random() * Math.min(3, this.platforms.length))];
             if (platform) {
@@ -1418,7 +1330,6 @@ const gameManager = {
             }
         }
 
-        // Increase score and speed
         game.score += 1 * game.scoreMultiplier;
         if (game.scrollSpeed < CONFIG.game.maxScrollSpeed) {
             game.scrollSpeed += CONFIG.game.scrollAcceleration;
@@ -1459,7 +1370,7 @@ const gameManager = {
                 if (game.wishes < 3) {
                     game.wishes++;
                 } else {
-                    game.score += 500; // Bonus points if already at max lives
+                    game.score += 500;
                 }
                 break;
         }
@@ -1468,21 +1379,16 @@ const gameManager = {
     },
 
     draw() {
-        // Draw platforms
         this.platforms.forEach(platform => platform.draw(game.ctx));
 
-        // Draw power-ups
         this.powerups.forEach(powerup => powerup.draw(game.ctx));
 
-        // Draw obstacles
         this.obstacles.forEach(obstacle => obstacle.draw(game.ctx));
 
-        // Draw player
         if (this.player) {
             this.player.draw(game.ctx);
         }
 
-        // Draw invincibility effect
         if (game.invincible) {
             game.ctx.save();
             game.ctx.globalAlpha = 0.3;
@@ -1503,13 +1409,10 @@ const gameManager = {
     },
 
     handleCollision(type) {
-        // If invincible and falling, teleport player back to safety
         if (game.invincible && type === 'fell') {
-            // Find the nearest platform or reset to safe position
             let safeY = 200;
             let safeX = this.player.x;
 
-            // Try to find a platform to land on
             for (let platform of this.platforms) {
                 if (platform.x <= this.player.x && platform.x + platform.width >= this.player.x) {
                     safeY = platform.y - this.player.height;
@@ -1518,27 +1421,24 @@ const gameManager = {
                 }
             }
 
-            // Teleport player back
             this.player.y = safeY;
             this.player.velocityY = 0;
             this.player.velocityX = 0;
             this.player.isDashing = false;
-            return; // Don't process as death
+            return;
         }
 
         if (!game.invincible) {
             game.wishes--;
             audioManager.playSound('hit');
 
-            // Trigger visual effects
-            this.triggerScreenShake(15, 400); // intensity, duration in ms
-            this.triggerRedFlash(0.6, 300); // intensity, duration in ms
+            this.triggerScreenShake(15, 400);
+            this.triggerRedFlash(0.6, 300);
             this.createHitEffect(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
             game.hitFlash.active = true;
             game.hitFlash.startTime = Date.now();
 
             if (game.wishes <= 0) {
-                // Reset player state before game over
                 if (this.player) {
                     this.player.isDashing = false;
                     this.player.velocityX = 0;
@@ -1546,7 +1446,6 @@ const gameManager = {
                 }
                 this.gameOver();
             } else {
-                // Reset player position
                 this.player.y = 200;
                 this.player.velocityY = 0;
                 this.player.velocityX = 0;
@@ -1569,11 +1468,10 @@ const gameManager = {
     },
 
     createHitEffect(x, y) {
-        // Create heart-breaking particle effect
         for (let i = 0; i < 30; i++) {
             const angle = (Math.PI * 2 * i) / 30;
             const speed = Math.random() * 8 + 4;
-            const hue = Math.random() * 60 + 320; // Pink to red colors
+            const hue = Math.random() * 60 + 320;
             this.player.particles.push({
                 x: x,
                 y: y,
@@ -1589,33 +1487,28 @@ const gameManager = {
     updateVisualEffects() {
         const currentTime = Date.now();
 
-        // Update screen shake
         if (game.screenShake.duration > 0) {
             const elapsed = currentTime - game.screenShake.startTime;
             if (elapsed < game.screenShake.duration) {
                 const progress = elapsed / game.screenShake.duration;
                 game.screenShake.intensity = game.screenShake.intensity * (1 - progress);
             } else {
-                // Shake duration complete - stop it
                 game.screenShake.intensity = 0;
                 game.screenShake.duration = 0;
             }
         }
 
-        // Update red flash
         if (game.redFlash.duration > 0) {
             const elapsed = currentTime - game.redFlash.startTime;
             if (elapsed < game.redFlash.duration) {
                 const progress = elapsed / game.redFlash.duration;
                 game.redFlash.intensity = game.redFlash.intensity * (1 - progress);
             } else {
-                // Flash duration complete - stop it
                 game.redFlash.intensity = 0;
                 game.redFlash.duration = 0;
             }
         }
 
-        // Update hit flash
         if (game.hitFlash.active) {
             const elapsed = currentTime - game.hitFlash.startTime;
             if (elapsed > game.hitFlash.duration) {
@@ -1628,22 +1521,18 @@ const gameManager = {
         game.state = 'gameOver';
         audioManager.stopBackgroundMusic();
 
-        // Clear all power-up states to prevent bugs
         game.invincible = false;
         game.invincibleTime = 0;
         game.scoreMultiplier = 1;
 
-        // Trigger a short death shake (stops automatically after duration)
-        this.triggerScreenShake(20, 250); // Short, intense shake for death
-        this.triggerRedFlash(0.8, 200); // Strong red flash for death
+        this.triggerScreenShake(20, 250);
+        this.triggerRedFlash(0.8, 200);
 
-        // Stop hit flash immediately
         game.hitFlash.active = false;
 
         const finalScore = Math.floor(game.score);
         document.getElementById('final-score').textContent = finalScore;
 
-        // Check and save high score
         const isNewHighScore = storageManager.saveHighScore(finalScore);
         if (isNewHighScore) {
             game.highScore = finalScore;
@@ -1679,7 +1568,6 @@ const gameManager = {
     },
 
     attachButtonListeners() {
-        // Re-attach start button listener (only if needed)
         const startBtn = document.getElementById('start-btn');
         if (startBtn && !startBtn.hasAttribute('data-listener-attached')) {
             startBtn.setAttribute('data-listener-attached', 'true');
@@ -1701,7 +1589,6 @@ const gameManager = {
         const wishesText = '❤️'.repeat(game.wishes) + '🖤'.repeat(3 - game.wishes);
         document.getElementById('wishes').textContent = wishesText;
 
-        // Show multiplier indicator
         const multiplierEl = document.getElementById('multiplier');
         if (game.scoreMultiplier > 1) {
             multiplierEl.textContent = `${game.scoreMultiplier}x`;
@@ -1710,7 +1597,6 @@ const gameManager = {
             multiplierEl.classList.add('hidden');
         }
 
-        // Show invincibility indicator
         const invincibleEl = document.getElementById('invincible');
         if (game.invincible) {
             invincibleEl.classList.remove('hidden');
@@ -1720,20 +1606,18 @@ const gameManager = {
     }
 };
 
-// Initialize game when page loads
 window.addEventListener('load', () => {
     console.log('🦄 Robot Unicorn Attack - Initializing...');
     try {
         gameManager.init();
         console.log('✅ Game ready! Click START GAME to play.');
-        
-        // Test if buttons exist after initialization
+
         setTimeout(() => {
             const startBtn = document.getElementById('start-btn');
             const skinBtns = document.querySelectorAll('.skin-btn');
             console.log('🔍 Debug: Start button exists?', !!startBtn);
             console.log('🔍 Debug: Skin buttons found:', skinBtns.length);
-            
+
             if (startBtn) {
                 console.log('🔍 Debug: Start button computed style:', window.getComputedStyle(startBtn).pointerEvents);
             }
