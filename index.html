@@ -1,83 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Robot Unicorn Attack</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <div class="game-header">
-            <h1>🦄 ROBOT UNICORN ATTACK 🦄</h1>
-        </div>
-        
-        <div id="game-container">
-            <canvas id="gameCanvas"></canvas>
-            
-            <div id="ui-overlay">
-                <div class="score-panel">
-                    <div class="left-panel">
-                        <div class="score">Score: <span id="score">0</span></div>
-                        <div class="high-score">High: <span id="high-score">0</span></div>
-                    </div>
-                    <div class="right-panel">
-                        <div class="wishes">Wishes: <span id="wishes">❤️❤️❤️</span></div>
-                        <button id="mute-btn" class="icon-btn">🔊</button>
-                    </div>
-                </div>
-                
-                <div class="status-indicators">
-                    <div id="multiplier" class="indicator hidden">2x MULTIPLIER</div>
-                    <div id="invincible" class="indicator hidden">⭐ INVINCIBLE ⭐</div>
-                </div>
-                
-                <div id="start-screen" class="screen">
-                    <h2>ROBOT UNICORN ATTACK</h2>
-                    <p>🖥️ PC: SPACE = Jump | Z = Dash</p>
-                    <p>📱 Mobile: Tap to Jump | Tap right side to Dash</p>
-                    
-                    <div class="skin-selector">
-                        <label>Choose Unicorn:</label>
-                        <div class="skin-buttons">
-                            <button type="button" class="skin-btn active" data-skin="0">🦄 1</button>
-                            <button type="button" class="skin-btn" data-skin="1">🦄 2</button>
-                            <button type="button" class="skin-btn" data-skin="2">🦄 3</button>
-                            <button type="button" class="skin-btn" data-skin="3">🦄 4</button>
-                            <button type="button" class="skin-btn" data-skin="4">🦄 5</button>
-                            <button type="button" class="skin-btn" data-skin="5">🦄 6</button>
-                        </div>
-                    </div>
-                    
-                    <button type="button" id="start-btn">START GAME</button>
-                    <div class="high-score-display">High Score: <span id="menu-high-score">0</span></div>
-                </div>
-                
-                <div id="pause-screen" class="screen hidden">
-                    <h2>⏸️ PAUSED</h2>
-                    <p>Current Score: <span id="pause-score">0</span></p>
-                    <div class="pause-buttons">
-                        <button id="resume-btn">RESUME</button>
-                        <button id="restart-from-pause-btn">RESTART</button>
-                        <button id="quit-btn">QUIT TO MENU</button>
-                    </div>
-                </div>
-                
-                <div id="game-over-screen" class="screen hidden">
-                    <h2>GAME OVER</h2>
-                    <p>Final Score: <span id="final-score">0</span></p>
-                    <p id="new-high-score" class="new-high-score hidden">🎉 NEW HIGH SCORE! 🎉</p>
-                    <button id="restart-btn">PLAY AGAIN</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="controls">
-            <p><strong>Controls:</strong> SPACE = Jump/Double Jump | Z = Dash | P = Pause</p>
-        </div>
-    </div>
-    
-    <script src="game.js"></script>
-</body>
-</html>
 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Robot Unicorn Attack</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="game-header">
+      <h1>🦄 ROBOT UNICORN ATTACK 🦄</h1>
+    </div>
+
+    <div id="game-container">
+      <canvas id="gameCanvas"></canvas>
+
+      <div id="ui-overlay">
+        <div class="score-panel">
+          <div class="left-panel">
+            <div class="score">Score: <span id="score">0</span></div>
+            <div class="high-score">High: <span id="high-score">0</span></div>
+          </div>
+          <div class="right-panel">
+            <div class="wishes">Wishes: <span id="wishes">❤️❤️❤️</span></div>
+            <button id="mute-btn" class="icon-btn">🔊</button>
+          </div>
+        </div>
+
+        <div class="status-indicators">
+          <div id="multiplier" class="indicator hidden">2x MULTIPLIER</div>
+          <div id="invincible" class="indicator hidden">⭐ INVINCIBLE ⭐</div>
+        </div>
+
+        <div id="start-screen" class="screen">
+          <h2>ROBOT UNICORN ATTACK</h2>
+          <p>🖥️ PC: SPACE = Jump | Z = Dash</p>
+          <p>📱 Mobile: Tap to Jump | Tap right side to Dash</p>
+
+          <div class="skin-selector">
+            <label>Choose Unicorn:</label>
+            <div class="skin-buttons">
+              <button type="button" class="skin-btn active" data-skin="0">🦄 1</button>
+              <button type="button" class="skin-btn" data-skin="1">🦄 2</button>
+              <button type="button" class="skin-btn" data-skin="2">🦄 3</button>
+              <button type="button" class="skin-btn" data-skin="3">🦄 4</button>
+              <button type="button" class="skin-btn" data-skin="4">🦄 5</button>
+              <button type="button" class="skin-btn" data-skin="5">🦄 6</button>
+            </div>
+          </div>
+
+          <button type="button" id="start-btn">START GAME</button>
+          <div class="high-score-display">High Score: <span id="menu-high-score">0</span></div>
+        </div>
+
+        <div id="pause-screen" class="screen hidden">
+          <h2>⏸️ PAUSED</h2>
+          <p>Current Score: <span id="pause-score">0</span></p>
+          <div class="pause-buttons">
+            <button id="resume-btn">RESUME</button>
+            <button id="restart-from-pause-btn">RESTART</button>
+            <button id="quit-btn">QUIT TO MENU</button>
+          </div>
+        </div>
+
+        <div id="game-over-screen" class="screen hidden">
+          <h2>GAME OVER</h2>
+          <p>Final Score: <span id="final-score">0</span></p>
+          <p id="new-high-score" class="new-high-score hidden">🎉 NEW HIGH SCORE! 🎉</p>
+          <button id="restart-btn">PLAY AGAIN</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <p><strong>Controls:</strong> SPACE = Jump/Double Jump | Z = Dash | P = Pause</p>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+
+</html>
