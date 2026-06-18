@@ -2,10 +2,6 @@
 
 A web-based recreation of the classic endless runner game "Robot Unicorn Attack" using HTML5 Canvas and vanilla JavaScript.
 
-[![Email](https://img.shields.io/badge/Email-Contact%20Me-blue?style=for-the-badge&logo=gmail)](mailto:solcanine66@gmail.com)
-[![Telegram](https://img.shields.io/badge/Telegram-Message%20Me-2CA5E0?style=for-the-badge&logo=telegram)](https://t.me/solcanine)
-[![Twitter](https://img.shields.io/badge/Twitter-@solcanine-black?style=for-the-badge&logo=twitter&logoColor=1DA1F2)](https://x.com/solcanine)
-
 ## 🎮 Features
 
 - **Smooth endless runner gameplay** - Auto-scrolling platforms with increasing difficulty
